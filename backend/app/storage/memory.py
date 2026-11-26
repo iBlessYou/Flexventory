@@ -1,6 +1,7 @@
 from uuid import UUID
 
 from app.models.users import User
+from app.models.records import Record
 from app.models.object_types import ObjectType
 
 users: dict[UUID, User] = {}
@@ -41,3 +42,23 @@ def save_object_type(object_type: ObjectType) -> ObjectType:
 
 def delete_object_type(object_type_id: UUID):
     del object_types[object_type_id]
+
+
+records: dict[UUID, Record] = {}
+
+
+def list_records(object_type_id: UUID | None = None) -> list[Record]:
+    return [record for record in records.values() if object_type_id is None or record.object_type_id == object_type_id]
+
+
+def get_record(record_id: UUID) -> Record | None:
+    return records.get(record_id)
+
+
+def save_record(record: Record) -> Record:
+    records[record.id] = record
+    return record
+
+
+def delete_record(record_id: UUID):
+    del records[record_id]

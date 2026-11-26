@@ -5,6 +5,7 @@ from fastapi import HTTPException
 from app.models.object_types import ObjectType
 from app.schemas.object_types import ObjectTypeCreate, ObjectTypeUpdate
 from app.storage import memory
+from app.services.validation import validate_record_data
 
 
 def get_object_type(object_type_id: UUID) -> ObjectType:
@@ -38,6 +39,9 @@ def update_object_type(object_type_id: UUID, data: ObjectTypeUpdate) -> ObjectTy
     changes = data.model_dump(exclude_unset=True)
     check_name(changes.get("name", object_type.name), object_type_id)
     check_parent(changes.get("parent_id", object_type.parent_id), object_type_id)
+    if "instance_schema" in changes:
+        for record in memory.list_records(object_type_id):
+            validate_record_data(record.data, data.instance_schema, 409)
     for field, value in changes.items():
         setattr(object_type, field, value)
     return memory.save_object_type(object_type)
@@ -47,4 +51,6 @@ def delete_object_type(object_type_id: UUID):
     get_object_type(object_type_id)
     if any(item.parent_id == object_type_id for item in memory.list_object_types()):
         raise HTTPException(409, "Move or delete child object types first")
+    if memory.list_records(object_type_id):
+        raise HTTPException(409, "Move or delete records first")
     memory.delete_object_type(object_type_id)
