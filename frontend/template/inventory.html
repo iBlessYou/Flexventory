@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="layout">
+  <aside class="panel sidebar">
+    <div class="section-heading"><h2>Типы сущностей</h2><a href="/types/new" aria-label="Создать тип">＋</a></div>
+    <a class="tree-link {% if not selected %}active{% endif %}" href="/">Все записи</a>
+    {% macro branch(parent_id) %}
+      <ul class="tree">
+      {% for type in types if type.parent_id == parent_id %}
+        <li>
+          {% if types | selectattr('parent_id', 'equalto', type.id) | list %}
+          <details open><summary><a class="{% if selected and selected.id == type.id %}active{% endif %}" href="/?object_type_id={{ type.id }}">{{ type.name }}</a></summary>{{ branch(type.id) }}</details>
+          {% else %}<a class="tree-link {% if selected and selected.id == type.id %}active{% endif %}" href="/?object_type_id={{ type.id }}">{{ type.name }}</a>{% endif %}
+        </li>
+      {% endfor %}
+      </ul>
+    {% endmacro %}
+    {{ branch(none) }}
+    {% if not types %}<p class="muted">Создайте первый тип и задайте схему его записей.</p>{% endif %}
+  </aside>
+  <section>
+    <div class="page-heading"><div><p class="eyebrow">Инвентарь</p><h1>{{ selected.name if selected else 'Все записи' }}</h1></div>
+      <div class="actions">{% if selected %}<a class="button secondary" href="/types/{{ selected.id }}/edit">Настроить тип</a>{% endif %}
+      {% if types %}<a class="button" href="/records/new{% if selected %}?object_type_id={{ selected.id }}{% endif %}">Добавить запись</a>{% else %}<a class="button" href="/types/new">Создать тип</a>{% endif %}</div>
+    </div>
+    <div class="panel table-wrap">
+      {% if records %}
+      <table><thead><tr><th>Название</th><th>Тип сущности</th><th></th></tr></thead><tbody>
+      {% for record in records %}<tr><td><a href="/records/{{ record.id }}">{{ record.name }}</a></td><td>{% for type in types if type.id == record.object_type_id %}{{ type.name }}{% endfor %}</td><td><a href="/records/{{ record.id }}/edit">Редактировать</a></td></tr>{% endfor %}
+      </tbody></table>
+      {% else %}<div class="empty"><h2>Записей пока нет</h2><p>Добавьте запись{% if selected %} в этот тип{% endif %}, чтобы заполнить инвентарь.</p></div>{% endif %}
+    </div>
+  </section>
+</div>
+{% endblock %}

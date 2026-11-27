@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Инвентарь{% endblock %} · Flexventory</title>
+  <link rel="stylesheet" href="/static/css/styles.css">
+  <script type="module" src="/static/js/forms.js"></script>
+</head>
+<body>
+  <header><a class="brand" href="/">Flexventory</a><nav><a href="/">Инвентарь</a><a href="/docs" target="_blank" rel="noopener">API / Swagger</a></nav><span class="storage">Хранение в памяти</span></header>
+  <main>{% block content %}{% endblock %}</main>
+  <footer>Данные доступны до перезапуска приложения.</footer>
+</body>
+</html>

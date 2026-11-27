@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Редактирование типа' if item else 'Новый тип' }}{% endblock %}
+{% block content %}
+<section class="editor">
+  <a class="back" href="/">К инвентарю</a><h1>{{ 'Редактирование типа' if item else 'Новый тип' }}</h1>
+  <form class="panel form" data-kind="type" data-id="{{ item.id if item else '' }}">
+    <label>Название<input name="name" required maxlength="100" value="{{ item.name if item else '' }}"></label>
+    <label>Родитель<select name="parent_id"><option value="">Без родителя</option>{% for type in types if not item or type.id != item.id %}<option value="{{ type.id }}" {% if item and item.parent_id == type.id %}selected{% endif %}>{{ type.name }}</option>{% endfor %}</select></label>
+    <label>Схема экземпляров · JSON<textarea name="instance_schema" rows="16" spellcheck="false" required>{{ (item.instance_schema if item else {'type': 'object', 'properties': {}, 'additionalProperties': false}) | tojson(indent=2) }}</textarea></label>
+    <p class="muted">JSON Schema draft 2020-12. Корневой type — object. Родитель определяет положение в дереве.</p>
+    <div class="error" role="alert" hidden></div>
+    <div class="actions"><button type="submit">Сохранить</button><a class="button secondary" href="/">Отмена</a>{% if item %}<button class="danger" type="button" data-delete="/api/v1/object-types/{{ item.id }}" data-redirect="/">Удалить тип</button>{% endif %}</div>
+  </form>
+</section>
+{% endblock %}

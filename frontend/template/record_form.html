@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Редактирование записи' if item else 'Новая запись' }}{% endblock %}
+{% block content %}
+<section class="editor">
+  <a class="back" href="/">К инвентарю</a><h1>{{ 'Редактирование записи' if item else 'Новая запись' }}</h1>
+  {% if types %}
+  <form class="panel form" data-kind="record" data-id="{{ item.id if item else '' }}">
+    <label>Название<input name="name" required maxlength="100" value="{{ item.name if item else '' }}"></label>
+    <label>Тип сущности<select name="object_type_id" required>{% for type in types %}<option value="{{ type.id }}" {% if selected_id == type.id %}selected{% endif %}>{{ type.name }}</option>{% endfor %}</select></label>
+    <div class="section-heading"><h2>Характеристики</h2><button class="secondary" type="button" id="toggle-json">Редактировать JSON</button></div>
+    <div id="fields" class="fields"></div>
+    <label id="json-label" hidden>Данные · JSON<textarea id="record-json" rows="14" spellcheck="false"></textarea></label>
+    <div class="error" role="alert" hidden></div>
+    <div class="actions"><button type="submit">Сохранить</button><a class="button secondary" href="/">Отмена</a></div>
+  </form>
+  <script type="application/json" id="record-data">{{ (item.data if item else {}) | tojson }}</script>
+  <script type="application/json" id="schemas">{ {% for type in types %}{{ type.id|string|tojson }}: {{ type.instance_schema|tojson }}{% if not loop.last %},{% endif %}{% endfor %} }</script>
+  {% else %}<div class="panel empty"><p>Сначала создайте тип сущности со схемой.</p><a class="button" href="/types/new">Создать тип</a></div>{% endif %}
+</section>
+{% endblock %}

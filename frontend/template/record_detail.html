@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}{{ item.name }}{% endblock %}
+{% block content %}
+<section class="editor">
+  <a class="back" href="/?object_type_id={{ object_type.id }}">{{ object_type.name }}</a>
+  <div class="page-heading"><h1>{{ item.name }}</h1><a class="button" href="/records/{{ item.id }}/edit">Редактировать</a></div>
+  <div class="panel form">
+    <dl class="properties">{% for key, value in item.data.items() %}<div><dt>{{ object_type.instance_schema.get('properties', {}).get(key, {}).get('title', key) }}</dt><dd>{% if value is mapping or (value is sequence and value is not string) %}<pre>{{ value | tojson(indent=2) }}</pre>{% elif value is sameas true %}Да{% elif value is sameas false %}Нет{% elif value is none %}—{% else %}{{ value }}{% endif %}</dd></div>{% endfor %}</dl>
+    {% if not item.data %}<p class="muted">Характеристики не заполнены.</p>{% endif %}
+    <p class="muted identifier">ID {{ item.id }}</p>
+    <div class="error" role="alert" hidden></div>
+    <button class="danger" data-delete="/api/v1/records/{{ item.id }}" data-redirect="/?object_type_id={{ object_type.id }}">Удалить запись</button>
+  </div>
+</section>
+{% endblock %}
